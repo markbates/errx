@@ -1,5 +1,7 @@
 package errx
 
+import "fmt"
+
 // go2 errors
 type Wrapper interface {
 	Unwrap() error
@@ -21,3 +23,27 @@ func Unwrap(err error) error {
 }
 
 var Cause = Unwrap
+
+func Wrap(err error, msg string) error {
+	return wrapped{
+		err: err,
+		msg: msg,
+	}
+}
+
+type wrapped struct {
+	err error
+	msg string
+}
+
+func (w wrapped) Error() string {
+	return fmt.Sprintf("%s: %s", w.msg, w.err)
+}
+
+func (w wrapped) Unwrap() error {
+	return w.err
+}
+
+func (w wrapped) Cause() error {
+	return w.err
+}
